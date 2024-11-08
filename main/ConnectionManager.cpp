@@ -59,6 +59,7 @@ void ConnectionManager::connectToWifi() {
  */
 void ConnectionManager::connectToWebsite() {
     http.begin(address);
+    http2.begin(address2);
 }
 
 /**
@@ -76,15 +77,12 @@ String ConnectionManager::getPayloadFromAddress() {
     Serial.println("WiFi not connected.");
     return "";
   }
-  http.begin(address);
-
   int http_code = http.GET();
   if (http_code != HTTP_CODE_OK) {
     Serial.println("HTTP Get Request failed. Code: " + http_code);
     return "";
   }
 
-  http.end();
   return http.getString();
 }
 
@@ -94,9 +92,7 @@ void ConnectionManager::postToAddress(float mot1, float mot2, float mot3, float 
     return;
   }
 
-  http.begin(address2);
-
-  http.addHeader("Content-Type", "application/json");
+  http2.addHeader("Content-Type", "application/json");
   String jsonPayload = "{\"motors\":{\"1\":" + String(mot1) + 
                          ",\"2\":" + String(mot2) + 
                          ",\"3\":" + String(mot3) + 
@@ -105,8 +101,7 @@ void ConnectionManager::postToAddress(float mot1, float mot2, float mot3, float 
                          ",\"roll\":" + String(roll) + 
                          ",\"yaw\":" + String(yaw) + "}}";
 
-  int httpResponseCode = http.POST(jsonPayload);
-  http.end();
+  int httpResponseCode = http2.POST(jsonPayload);
 
   if (httpResponseCode != HTTP_CODE_OK) {
     Serial.println("HTTP Get Request failed. Code: " + httpResponseCode);

@@ -29,6 +29,7 @@ private:
   const char* address;   ///< HTTP server URL
   const char* address2;
   HTTPClient http;       ///< HTTP client instance
+  HTTPClient http2;       ///< HTTP client instance
 
 public:
   /**
