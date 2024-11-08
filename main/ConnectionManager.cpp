@@ -9,13 +9,17 @@
  *
  * ### Dependencies:
  * - ConnectionManager.h: Declaration of the ConnectionManager class and its members
+
  * - WiFi.h: Manages WiFi connections.
+
  * - HTTPClient.h: Handles HTTP requests.
+
  */
 
 #include "ConnectionManager.h" // ConnectionManager class and member definitions
 #include <WiFi.h> // WiFi connection library
 #include <HTTPClient.h> // HTTP request library
+
 #include <string>
 
 /**
@@ -29,6 +33,7 @@
  * @param password The WiFi network password.
  * @param address The URL of the HTTP server to connect to.
  */
+
 ConnectionManager::ConnectionManager(const char* ssid, const char* password, const char* address, const char* address2) :
   ssid(ssid), password(password), address(address), address2(address2) {}
 
@@ -37,6 +42,7 @@ ConnectionManager::ConnectionManager(const char* ssid, const char* password, con
  *
  * @details
  * This method attempts to connect to the WiFi network specified during the class instantiation.
+
  * It will print the connection status to the Serial monitor.
  */
 void ConnectionManager::connectToWifi() {
@@ -49,10 +55,14 @@ void ConnectionManager::connectToWifi() {
   }
 
   Serial.println("\nWiFi connected");
+
 }
 
+
 /**
+
  * @brief Initializes the HTTP client with the server address.
+
  *
  * @details
  * Prepares the HTTPClient object to connect to the provided server URL.
@@ -65,19 +75,25 @@ void ConnectionManager::connectToWebsite() {
 /**
  * @brief Fetches the payload from the server address.
  *
+
  * @details
+
  * Starts by checking if wifi is connected. Then attemps a HTTP get request to
+
  * the address and checks that it is HTTP_CODE_OK. Finally if HTTP get request
  * succeded returns a string. If HTTP request fails returns an empty string.
+
  *
  * @return String The response from the server as a string. Returns an empty string if the request fails.
  */
 String ConnectionManager::getPayloadFromAddress() {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi not connected.");
+
     return "";
   }
   int http_code = http.GET();
+
   if (http_code != HTTP_CODE_OK) {
     Serial.println("HTTP Get Request failed. Code: " + http_code);
     return "";
@@ -108,4 +124,5 @@ void ConnectionManager::postToAddress(float mot1, float mot2, float mot3, float 
     return;
   }
   return;
+
 }

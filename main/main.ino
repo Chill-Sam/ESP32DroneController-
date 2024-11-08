@@ -7,6 +7,7 @@
 #include "AHRS.h"
 
 // Attitude and heading reference system
+
 AHRS ahrs;
 
 // Network settings
@@ -19,23 +20,29 @@ const char* address2 = "";
 // Connection manager instance
 ConnectionManager connection(ssid, password, address, address2);
 
+
 // JSON document for parsing incoming data
 StaticJsonDocument<2048> doc;
 
 bool isON;
+
 bool pidON;
+
 
 // Timing variables
 unsigned long previousTime = 0;
+
 
 // ESC control settings
 std::array<const int, 4> escPins = {26, 25, 33, 32};
 const int frequency = 50;
 const int resolution = 16;
 const int minPulseWidth = 1000;
+
 const int maxPulseWidth = 2000;
 
 // Engine controller instance
+
 EngineController controller(escPins, frequency, resolution, minPulseWidth, maxPulseWidth);
 
 // Drone state variables
@@ -52,6 +59,7 @@ double rollKp = 0.7, rollKi = 0.7, rollKd = 0.1;
 double yawKp = 0.7, yawKi = 0.7, yawKd = 0.1;
 double altKp = 0.7, altKi = 0.7, altKd = 0.1;
 double pitchSetPoint, rollSetPoint, yawSetPoint, pressureSetPoint = 0;
+
 double maxPitch, maxRoll, maxYaw = 15;
 double maxPressure = 2;
 
@@ -69,15 +77,19 @@ void decodeJson(String payload) {
     return; // Exit if there is a parsing error
   }
 
+
   // Extract joystick and switch states from the JSON object
   isON         = (doc["Values"]["engine"] == "on") ? true : false;                // State of the switch
+
   pidON        = (doc["Values"]["pid"] == "on") ? true : false;                // State of the switch
 }
 
 void setMotorThrottleManual() {
   if (Serial.available() > 0) {
     String input = Serial.readStringUntil('\n');
+
     input.trim();  // Remove any extraneous whitespace.
+
 
     // Parse input assuming the format "engineNumber throttle"
     int separatorIndex = input.indexOf(" ");
@@ -85,9 +97,11 @@ void setMotorThrottleManual() {
       int engineNumber = input.substring(0, separatorIndex).toInt();  // Convert the engine number to an integer.
       float throttle = input.substring(separatorIndex + 1).toFloat();  // Convert the throttle value to a float.
 
+
       // Use the controller object to set the engine speed.
       controller.setEngineSpeed(engineNumber, throttle);
     }
+
   }
 }
 
@@ -102,7 +116,9 @@ void pidControl() {
   pidPitch.tune(pitchKp, pitchKi, pitchKd);
   pidPitch.limit(MIN_PID, MAX_PID); // Set output limits for pitch
 
+
   pidRoll.begin();
+
   pidRoll.setpoint(rollSetPoint); // Desired roll setpoint
   pidRoll.tune(rollKp, rollKi, rollKd);
   pidRoll.limit(MIN_PID, MAX_PID); // Set output limits for roll
@@ -116,6 +132,7 @@ void pidControl() {
   pidAlt.setpoint(pressureSetPoint);
   pidAlt.tune(altKp, altKi, altKd);
   pidAlt.limit(MIN_PID, MAX_PID);
+
 
   // Compute PID control outputs
   float outputPitch = pidPitch.compute(dronePitch);
@@ -152,6 +169,7 @@ void setPID() {
 
     // Find the index of the first space character
     int separatorIndex = input.indexOf(" ");
+
     if (separatorIndex > 0) { // Ensure there's a space character in the input
       int value = input.substring(0, separatorIndex).toInt(); // Parse the parameter index
       float value2 = input.substring(separatorIndex + 1).toFloat(); // Parse the value
@@ -168,6 +186,7 @@ void setPID() {
       else if (value == 2){
         rollKd = value2;
         Serial.println("Set d value to " + String(rollKd));
+
       }
       else if (value == 3){
         liftOffValue = value2;
@@ -179,6 +198,7 @@ void setPID() {
 
 
 void setup() {
+
   Serial.begin(115200);
   Serial.println("System Online");
 
@@ -200,6 +220,7 @@ void loop() {
   String payload = connection.getPayloadFromAddress();
   decodeJson(payload);
 
+
   if (isON) {
     nowMillis = millis();
     Serial.println(nowMillis - thenMillis);
@@ -213,11 +234,13 @@ void loop() {
     droneRoll = ahrs.roll;
     droneYaw = ahrs.yaw;
 
+
     if (!pidON) {
       controller.setEngineSpeed(5, liftOffValue);
       connection.postToAddress(liftOffValue, liftOffValue, liftOffValue, liftOffValue, dronePitch, droneRoll, droneYaw);
     } else if (pidON) {
       Serial.println("4");
+
       pidControl(); 
       Serial.println("5");
     }
@@ -229,6 +252,7 @@ void loop() {
     thenMillis = nowMillis;
   }
   else {
+
     controller.stopEngines(1000);
     Serial.println("Off");
   }

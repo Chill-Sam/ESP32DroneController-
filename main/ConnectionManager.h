@@ -2,7 +2,9 @@
  * @file ConnectionManager.h
  * @brief Declaration of the ConnectionManager class and associated functions.
  *
+
  * @details
+
  * This header file contains the declaration of the ConnectionManager class and
  * related functions. The ConnectionManager class provides functionality for
  * handling the wifi and http requests for the ESP32 drone controller.
@@ -11,6 +13,7 @@
  * - WiFi.h: Manages WiFi connections.
  * - HTTPClient.h: Handles HTTP requests.
  */
+
 #include <WiFi.h> // WiFi connection library
 #include <HTTPClient.h> // HTTP request library
 
@@ -21,6 +24,7 @@
  * @details
  * ConnectionManager is responsible for handling the http requests of the
  * ESP32 drone controller to get control data.
+
  */
 class ConnectionManager {
 private:
@@ -28,13 +32,18 @@ private:
   const char* password;  ///< WiFi password
   const char* address;   ///< HTTP server URL
   const char* address2;
-  HTTPClient http;       ///< HTTP client instance
+
+  HTTPClient http1;       ///< HTTP client instance
+
   HTTPClient http2;       ///< HTTP client instance
+
 
 public:
   /**
+
    * @brief Constructor to initialize ConnectionManager with WiFi and server details.
    * 
+
    * @param ssid The WiFi network SSID.
    * @param password The WiFi network password.
    * @param address The URL of the HTTP server to connect to.
@@ -48,6 +57,7 @@ public:
    * This method attempts to connect to the WiFi network specified during the class instantiation.
    * It will print the connection status to the Serial monitor.
    */
+
   void connectToWifi();
 
   /**
@@ -57,6 +67,7 @@ public:
    * Prepares the HTTPClient object to connect to the provided server URL.
    */
   void connectToWebsite();
+
 
   /**
    * @brief Fetches the payload from the server address.
@@ -71,3 +82,5 @@ public:
 
   void postToAddress(float mot1, float mot2, float mot3, float mot4, float pitch, float roll, float yaw);
 };
+
+
